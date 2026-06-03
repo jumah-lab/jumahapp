@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al Majlis Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CSS VARIABLES & THEMING --- */
+        :root {
+            --bg-sand: #F5F5DC;
+            --accent-gold: #D4AF37;
+            --accent-teal: #008080;
+            --text-dark: #2C2C2C;
+            --text-light: #555555;
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-blur: blur(8px);
+            --uae-green: #00732F;
+            --uae-red: #FF0000;
+        }
+
+        /* --- GLOBAL & ANIMATION STYLES --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-sand);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 2rem;
+            opacity: 0;
+            animation: fadeIn 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- HEADER --- */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-teal);
+            letter-spacing: 1px;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+        }
+
+        header h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 25%;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+        }
+
+        /* --- GRID LAYOUT --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            flex-grow: 1;
+        }
+
+        /* --- CARDS (GLASS EFFECT + HOVER GLOW) --- */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 2px solid var(--accent-gold);
+            border-radius: 16px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+            min-height: 400px;
+        }
+
+        .card:hover {
+            border-color: #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4), 0 10px 30px rgba(0, 80, 80, 0.08);
+            transform: translateY(-4px);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            color: var(--accent-teal);
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            padding-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        /* --- CARD 1: DAILY KARAM (TODO LIST) --- */
+        .todo-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .todo-input-group input {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid rgba(0, 80, 80, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border 0.3s ease;
+        }
+
+        .todo-input-group input:focus {
+            border-color: var(--accent-teal);
+        }
+
+        .todo-btn {
+            background-color: var(--accent-teal);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s ease, background-color 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Tactile button feedback */
+        .todo-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+        }
+
+        .todo-btn:hover {
+            background-color: #006666;
+        }
+
+        .todo-list {
+            list-style: none;
+            overflow-y: auto;
+            max-height: 250px;
+        }
+
+        .todo-item {
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            border-left: 3px solid var(--accent-gold);
+            font-size: 0.95rem;
+            word-wrap: break-word;
+        }
+
+        .todo-item:hover {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .todo-item.completed {
+            text-decoration: line-through;
+            opacity: 0.6;
+            border-left-color: var(--text-light);
+        }
+
+        /* --- CARD 2: REFLECTION CLOCK (TIMER) --- */
+        .card.timer-running {
+            background: rgba(230, 245, 230, 0.8) !important; /* Soft Green */
+        }
+
+        .timer-display {
+            font-size: 3.5rem;
+            font-weight: 300;
+            text-align: center;
+            margin: 2rem 0 1rem 0;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-dark);
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .timer-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--accent-teal);
+            background: transparent;
+            color: var(--accent-teal);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .timer-btn:hover {
+            background: var(--accent-teal);
+            color: white;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: auto;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 100%;
+            background-color: var(--uae-green);
+            transition: width 1s linear, background-color 0.5s ease;
+        }
+
+        /* --- CARD 3: FOUNDERS WISDOM --- */
+        .quote-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex-grow: 1;
+            padding: 1rem 0;
+        }
+
+        .quote-text {
+            font-size: 1.1rem;
+            font-style: italic;
+            line-height: 1.6;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .quote-author {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent-gold);
+            text-align: right;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .arabic-word-highlight {
+            font-style: italic;
+            color: var(--accent-teal);
+            font-size: 0.95rem;
+        }
+
+        /* --- RESPONSIVE DESIGN (MOBILE STACKING) --- */
+        @media (max-width: 900px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            body {
+                padding: 1rem;
+            }
+            header {
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Al Majlis Digital</h1>
+    </header>
+
+    <main class="dashboard-grid">
+        
+        <section class="card" id="karam-card">
+            <h2>Daily Karam</h2>
+            <div class="todo-input-group">
+                <input type="text" id="todo-input" placeholder="Enter an act of kindness..." aria-label="New Act of Karam">
+                <button class="todo-btn" id="todo-add-btn">Add</button>
+            </div>
+            <ul class="todo-list" id="todo-list"></ul>
+        </section>
+
+        <section class="card" id="timer-card">
+            <h2>Reflection Clock</h2>
+            <div class="timer-display" id="timer-display">25:00</div>
+            <div class="timer-controls">
+                <button class="timer-btn" id="timer-start">Start</button>
+                <button class="timer-btn" id="timer-pause">Pause</button>
+                <button class="timer-btn" id="timer-reset">Reset</button>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Founders Wisdom</h2>
+            <div class="quote-container">
+                <p class="quote-text" id="quote-text">Loading wisdom...</p>
+                <p class="quote-author" id="quote-author"></p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p class="arabic-word-highlight">Asalah - Authenticity - Ah-sah-lah</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // ==========================================
+            // 1. DAILY KARAM (TO-DO LIST) WITH STORAGE
+            // ==========================================
+            const todoInput = document.getElementById('todo-input');
+            const todoAddBtn = document.getElementById('todo-add-btn');
+            const todoList = document.getElementById('todo-list');
+
+            let actsOfKaram = JSON.parse(localStorage.getItem('actsOfKaram')) || [];
+
+            function saveAndRenderTodos() {
+                localStorage.setItem('actsOfKaram', JSON.stringify(actsOfKaram));
+                todoList.innerHTML = '';
+                
+                actsOfKaram.forEach((todo, index) => {
+                    const li = document.createElement('li');
+                    li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+                    li.textContent = todo.text;
+                    
+                    // Single Click to Cross Out
+                    li.addEventListener('click', () => {
+                        actsOfKaram[index].completed = !actsOfKaram[index].completed;
+                        saveAndRenderTodos();
+                    });
+
+                    // Double Click to Delete
+                    li.addEventListener('dblclick', () => {
+                        actsOfKaram.splice(index, 1);
+                        saveAndRenderTodos();
+                    });
+
+                    todoList.appendChild(li);
+                });
+            }
+
+            function addTodo() {
+                const text = todoInput.value.trim();
+                if (text !== '') {
+                    actsOfKaram.push({ text: text, completed: false });
+                    todoInput.value = '';
+                    saveAndRenderTodos();
+                }
+            }
+
+            todoAddBtn.addEventListener('click', addTodo);
+            todoInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addTodo();
+            });
+
+            // Initial load of items
+            saveAndRenderTodos();
+
+
+            // ==========================================
+            // 2. REFLECTION CLOCK (COUNTDOWN TIMER)
+            // ==========================================
+            const timerCard = document.getElementById('timer-card');
+            const timerDisplay = document.getElementById('timer-display');
+            const timerStartBtn = document.getElementById('timer-start');
+            const timerPauseBtn = document.getElementById('timer-pause');
+            const timerResetBtn = document.getElementById('timer-reset');
+            const progressBar = document.getElementById('progress-bar');
+
+            const TOTAL_SECONDS = 25 * 60;
+            let timeRemaining = TOTAL_SECONDS;
+            let timerInterval = null;
+
+            function updateTimerDisplay() {
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Progress percentage calculating downwards
+                const progressPercent = (timeRemaining / TOTAL_SECONDS) * 100;
+                progressBar.style.width = `${progressPercent}%`;
+
+                // Aesthetic balance: dynamic shift to red if countdown enters final 10%
+                if (progressPercent <= 10) {
+                    progressBar.style.backgroundColor = 'var(--uae-red)';
+                } else {
+                    progressBar.style.backgroundColor = 'var(--uae-green)';
+                }
+            }
+
+            function startTimer() {
+                if (timerInterval) return; // Prevent multiple instances
+                
+                timerCard.classList.add('timer-running');
+                timerInterval = setInterval(() => {
+                    if (timeRemaining > 0) {
+                        timeRemaining--;
+                        updateTimerDisplay();
+                    } else {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        timerCard.classList.remove('timer-running');
+                        alert("Time for reflection complete.");
+                    }
+                }, 1000);
+            }
+
+            function pauseTimer() {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                timerCard.classList.remove('timer-running');
+            }
+
+            function resetTimer() {
+                pauseTimer();
+                timeRemaining = TOTAL_SECONDS;
+                updateTimerDisplay();
+            }
+
+            timerStartBtn.addEventListener('click', startTimer);
+            timerPauseBtn.addEventListener('click', pauseTimer);
+            timerResetBtn.addEventListener('click', resetTimer);
+
+            // Initialize progress bar and display matching initial states
+            updateTimerDisplay();
+
+
+            // ==========================================
+            // 3. FOUNDERS WISDOM (RANDOM JSON QUOTE)
+            // ==========================================
+            const foundersQuotes = [
+                {
+                    "quote": "History is a continuous chain of events. The present is only an extension of the past.",
+                    "author": "Sheikh Zayed bin Sultan Al Nahyan"
+                },
+                {
+                    "quote": "He who does not know his past cannot make the best of his present and future, for it is from the past that we learn.",
+                    "author": "Sheikh Zayed bin Sultan Al Nahyan"
+                },
+                {
+                    "quote": "Arab oil can never be dearer than Arab blood.",
+                    "author": "Sheikh Zayed bin Sultan Al Nahyan"
+                },
+                {
+                    "quote": "A nation without a past is a nation without a present or a future.",
+                    "author": "Sheikh Zayed bin Sultan Al Nahyan"
+                },
+                {
+                    "quote": "The future belongs to those who can imagine it, design it, and execute it. It isn’t something you await, but rather create.",
+                    "author": "Sheikh Mohammed bin Rashid Al Maktoum"
+                },
+                {
+                    "quote": "We are not building an era; we are building a nation that will live for eras.",
+                    "author": "Sheikh Mohammed bin Rashid Al Maktoum"
+                },
+                {
+                    "quote": "The race for excellence has no finish line.",
+                    "author": "Sheikh Mohammed bin Rashid Al Maktoum"
+                },
+                {
+                    "quote": "To take risks and fail is not a failure. Real failure is to fear taking any risks at all.",
+                    "author": "Sheikh Mohammed bin Rashid Al Maktoum"
+                },
+                {
+                    "quote": "Wealth is not money. Wealth lies in men. This is where true power lies.",
+                    "author": "Sheikh Zayed bin Sultan Al Nahyan"
+                },
+                {
+                    "quote": "The workspace should inspire creativity, generate efficiency, and embrace the future.",
+                    "author": "Sheikh Mohammed bin Rashid Al Maktoum"
+                }
+            ];
+
+            function displayRandomQuote() {
+                const quoteTextElem = document.getElementById('quote-text');
+                const quoteAuthorElem = document.getElementById('quote-author');
+                
+                const randomIndex = Math.floor(Math.random() * foundersQuotes.length);
+                const randomQuote = foundersQuotes[randomIndex];
+                
+                quoteTextElem.textContent = `“${randomQuote.quote}”`;
+                quoteAuthorElem.textContent = `— ${randomQuote.author}`;
+            }
+
+            displayRandomQuote();
+        });
+    </script>
+</body>
+</html>
